@@ -6,9 +6,12 @@ require("tetromino")
 g_playfield = playfield
 
 
+
 function love.load()
 	g_playfield.setup()
 	assets.load()
+
+	tetroBlock = getTetromino()
 end
 
 function love.update(dt)
@@ -18,14 +21,17 @@ function love.update(dt)
 end
 
 function love.draw()
-
 	love.graphics.clear()
 	love.graphics.setColor(255, 255, 255)
 	love.graphics.print("next",20,20)
 	g_playfield.draw(PLAYFIELD_XOFFSET,PLAYFIELD_YOFFSET)
 
-  
-	iTetromino.draw()
+	drawTetromino(tetroBlock)
+end
+
+function love.keypressed( key, scancode, isrepeat )
+	if key == "r" then rotateTetromino(tetroBlock) end 
+
 end
 
 function drawBlock(color,x,y)
