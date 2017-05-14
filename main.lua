@@ -2,20 +2,24 @@ require("mainVariables")
 require("playfield")
 require("assets")
 require("tetromino")
+require("tetrominoTypes")
 
 g_playfield = playfield
-
 
 
 function love.load()
 	g_playfield.setup()
 	assets.load()
 
-	tetroBlock = getTetromino()
+	
+
+	currentTetromino = getNewTetromino()
+	nextTetromino = getNewTetromino()
 end
 
 function love.update(dt)
-	g_playfield.update(dt) 
+	g_playfield.update(dt)
+	updateTetromino(currentTetromino,dt)
 --	g_playfield.lineCheck()
 
 end
@@ -23,14 +27,24 @@ end
 function love.draw()
 	love.graphics.clear()
 	love.graphics.setColor(255, 255, 255)
-	love.graphics.print("next",20,20)
+
 	g_playfield.draw(PLAYFIELD_XOFFSET,PLAYFIELD_YOFFSET)
 
-	drawTetromino(tetroBlock)
+	love.graphics.print("next",20,20)
+	drawTetromino(PLAYFIELD_XOFFSET,PLAYFIELD_YOFFSET,currentTetromino)
+	drawTetromino(-64,30,nextTetromino)
 end
 
 function love.keypressed( key, scancode, isrepeat )
-	if key == "r" then rotateTetromino(tetroBlock) end 
+	if key == "z" then rotateTetromino(currentTetromino) end 
+	if key == "left" and 
+		not checkTetrominoCollision(currentTetromino.xPos-1,currentTetromino.yPos,currentTetromino,g_playfield)
+		then currentTetromino.xPos = currentTetromino.xPos -1 
+	end
+	if key == "right" and 
+		not checkTetrominoCollision(currentTetromino.xPos+1,currentTetromino.yPos,currentTetromino,g_playfield)
+		then currentTetromino.xPos = currentTetromino.xPos +1 end
+--	if key == "right" then
 
 end
 
@@ -48,4 +62,9 @@ function drawBlock(color,x,y)
 
 	love.graphics.draw(assets.block,x,y)
 	::continue::
+end
+
+
+function table.clone(org)
+  return {table.unpack(org)}
 end

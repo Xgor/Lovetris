@@ -1,59 +1,11 @@
--- tetromino = { 
---	block = {}, 
---	xPos=0,
---	yPos=0
---	xPos =PLAYFIELD_WIDTH/2,
---	yPos = PLAYFIELD_HEIGHT
--- }
-
-function getTetromino()
-	local iTetromino= {0,1,0,0,
-				 	   0,1,0,0,
-				 	   0,1,0,0,
-				 	   0,1,0,0}
-
-	local oTetromino = {0,0,0,0,
-				  		2,2,0,0,
-				  		2,2,0,0,
-				  		0,0,0,0}
-
-
-	local tTetromino = {0,0,0,0,
-					  	3,3,3,0,
-					  	0,3,0,0,
-					  	0,0,0,0}
-
-
-	local jTetromino = {0,0,0,0,
-					  	4,4,4,0,
-					  	0,0,4,0,
-					  	0,0,0,0}
-
-
-	local lTetromino = {0,0,0,0,
-				 	 	5,5,5,0,
-				 	 	5,0,0,0,
-				 	 	0,0,0,0}
-
-
-	local sTetromino = {0,0,0,0,
-				  		0,6,6,0,
-				  		6,6,0,0,
-				  		0,0,0,0}
-
-
-	local zTetromino = {0,0,0,0,
-				 		7,7,0,0,
-				 		0,7,7,0,
-				 		0,0,0,0}
-
+function getNewTetromino()
 	local tetromino ={}
 
 	tetromino.xPos =PLAYFIELD_WIDTH/2
 	tetromino.yPos = 0
 
 	local blockType = love.math.random(7)
-
+ 	tetromino.block = zTetromino
 	if blockType == 1 then tetromino.block = iTetromino 
 	elseif blockType == 2 then tetromino.block = oTetromino 
 	elseif blockType == 3 then tetromino.block = tTetromino 
@@ -66,6 +18,76 @@ function getTetromino()
 	return tetromino
 end
 	
+function updateTetromino(tetromino,dt)
+	TetrominoFallTimer = TetrominoFallTimer- dt
+
+	if love.keyboard.isDown("down") and TetrominoFallTimer>MAX_FALL_SPEED then
+		TetrominoFallTimer = MAX_FALL_SPEED
+	end
+
+	if TetrominoFallTimer < 0 then
+		fallUpdate(tetromino)
+	end
+
+
+	for x = 0,3 do
+		for y = 0,3 do
+			if tetromino.block[x+y*4] > 0 then
+				if 	playfield.blocks[xOffset+x][yOffset+y] > 0 then
+					print("...")
+				end
+			end
+		end
+	end
+--	if love.keyboard.isDown("left") then currentTetromino.xPos = currentTetromino.xPos -1 end
+--	if love.keyboard.isDown("right") then currentTetromino.xPos = currentTetromino.xPos +1 end
+
+end
+
+function fallUpdate(tetromino)
+	tetromino.yPos = tetromino.yPos +1
+	
+	TetrominoFallTimer = FALL_SPEED
+
+	if checkTetrominoCollision(tetromino.xPos,tetromino.yPos+1,tetromino,g_playfield) then
+		for x = 0,3 do
+			for y = 0,3 do
+			--	if 	playfield.blocks[tetromino.xPos+x][tetromino.yPos+y] > 0 then
+					playfield.blocks[tetromino.xPos+x][tetromino.yPos+y] = 1
+			--	end
+			end
+		end
+		getNextTetromino()
+	end
+
+end
+
+function checkTetrominoCollision(xOffset,yOffset,tetromino,playfield)
+--	collision = false
+
+	if xOffset <0 or xOffset>7 or yOffset>17 then
+		return true
+	end
+
+	for x = 0,3 do
+		for y = 0,3 do
+			if tetromino.block[x+y*4] > 0 then
+				if 	playfield.blocks[xOffset+x][yOffset+y] > 0 then
+					return true
+				end
+			end
+		end
+	end
+	return false
+
+end
+
+function getNextTetromino()
+	currentTetromino = nextTetromino
+	nextTetromino = getNewTetromino()
+	currentTetromino.xPos=PLAYFIELD_WIDTH/2
+end
+
 --	0  1  2  3
 --	4  5  6  7
 --	8  9  10 11
@@ -91,7 +113,7 @@ function rotateTetromino(tetromino)
 	tetromino.block[11]=tetromino.block[13]
 	tetromino.block[13]=tetromino.block[4]
 	tetromino.block[4] = t
---
+
 --	t = tetromino.block[0]
 --	tetromino.block[0] = tetromino.block[3]
 --	tetromino.block[3]=tetromino.block[12]
@@ -99,14 +121,16 @@ function rotateTetromino(tetromino)
 --	tetromino.block[15] = t
 
 end
+--math.floor(
 
-function drawTetromino(tetromino)
+function drawTetromino(xOffset,yOffset,tetromino)
 	for x = 0,3 do
 		for y = 0,3 do
 	--		love.graphics.print("Test", x, y)
 	--		drawBlock(2,2,2)
-			drawBlock(tetromino.block[x*4+y],PLAYFIELD_XOFFSET+ (x+tetromino.xPos)*BLOCK_WIDTH,
-				PLAYFIELD_YOFFSET+(y+tetromino.yPos)*BLOCK_HEIGHT)
+			drawBlock(tetromino.block[x+y*4],xOffset+ math.floor(x+tetromino.xPos)*BLOCK_WIDTH,
+				yOffset+math.floor(y+tetromino.yPos)*BLOCK_HEIGHT)
 		end
 	end
 end
+
