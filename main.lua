@@ -8,13 +8,15 @@ g_playfield = playfield
 
 
 function love.load()
+	currentTetromino = getNewTetromino()
+	nextTetromino = getNewTetromino()
+
 	g_playfield.setup()
 	assets.load()
 
 	
 
-	currentTetromino = getNewTetromino()
-	nextTetromino = getNewTetromino()
+
 end
 
 function love.update(dt)
@@ -38,11 +40,11 @@ end
 function love.keypressed( key, scancode, isrepeat )
 	if key == "z" then rotateTetromino(currentTetromino) end 
 	if key == "left" and 
-		not checkTetrominoCollision(currentTetromino.xPos-1,currentTetromino.yPos,currentTetromino,g_playfield)
+		not checkTetrominoCollision(currentTetromino,currentTetromino.xPos-1,currentTetromino.yPos,g_playfield)
 		then currentTetromino.xPos = currentTetromino.xPos -1 
 	end
 	if key == "right" and 
-		not checkTetrominoCollision(currentTetromino.xPos+1,currentTetromino.yPos,currentTetromino,g_playfield)
+		not checkTetrominoCollision(currentTetromino,currentTetromino.xPos+1,currentTetromino.yPos,g_playfield)
 		then currentTetromino.xPos = currentTetromino.xPos +1 end
 --	if key == "right" then
 

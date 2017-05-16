@@ -43,7 +43,7 @@ function playfield.clearLines()
 --	local tempBlocks = playfield.blocks
 
 	for y = 1,PLAYFIELD_HEIGHT do
-		if playfield.blocks[0][y] < 1 then 
+		if playfield.blocks[0][y] == -1 then 
 			for x = 0,PLAYFIELD_WIDTH do
 				playfield.blocks[x][y] = playfield.blocks[x][y-1]
 				playfield.blocks[x][y-1] = 0
